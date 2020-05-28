@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from django.forms.models import model_to_dict
 from example.models import *
+from example.serializers import *
 
 
 class FindExamples(APIView):
@@ -22,5 +24,6 @@ class FindExamples(APIView):
         else:
             maximum = 5
         examples = examples[:maximum]
-        examples_dict = [model_to_dict(example) for example in examples]
-        return Response(data=examples_dict, status=200, content_type='application/json')
+        examples_serializer = ExamplesSerializer(examples, many=True)
+        examples_json = JSONRenderer().render(examples_serializer.data)
+        return Response(data=examples_json, status=200, content_type='application/json')
