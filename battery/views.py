@@ -16,9 +16,10 @@ class BatteryView(APIView):
     def get(self, request):
         params = request.query_params
         if 'lesson_id' in params:
-            batteries = Battery.objects.filter(user=request.user, card__lesson__id=params['lesson_id'])
+            id = int(params['lesson_id'])
+            batteries = Battery.objects.filter(user=request.user, card__lesson=id)
         else:
             batteries = Battery.objects.filter(user=request.user)
-        batteries_serializer = BatterySerializer(many=True)
+        batteries_serializer = UserBatteriesSerializer(batteries, many=True)
         batteries_json = JSONRenderer().render(batteries_serializer.data)
-        return Response(data=batteries_json, status=200, content_type='application/json')
+        return Response(data=batteries_json)
