@@ -20,6 +20,5 @@ class BatteryView(APIView):
             batteries = Battery.objects.filter(user=request.user, card__lesson=id)
         else:
             batteries = Battery.objects.filter(user=request.user)
-        batteries_serializer = UserBatteriesSerializer(batteries, many=True)
-        batteries_json = JSONRenderer().render(batteries_serializer.data)
-        return Response(data=batteries_json)
+        batteries_serializer = BatterySerializer(batteries, many=True)
+        return Response(batteries_serializer.data)

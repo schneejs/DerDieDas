@@ -2,7 +2,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from django.forms.models import model_to_dict
 from example.models import *
 from example.serializers import *
 

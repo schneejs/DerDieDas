@@ -11,8 +11,8 @@ class Battery(models.Model):
             self.level
         )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="batteries", on_delete=models.CASCADE)
+    card = models.ForeignKey(Card, related_name="batteries", on_delete=models.CASCADE)
     level = models.SmallIntegerField(validators=[
         MinValueValidator(0),
         MaxValueValidator(4)

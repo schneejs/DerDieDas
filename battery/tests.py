@@ -36,7 +36,7 @@ class BatteryTest(TestCase):
             'HTTP_AUTHORIZATION': "Bearer " + token["access"]
         }
         response = c.get("/api/battery/", **auth_headers)
-        response_json = loads(response.json())
+        response_json = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response_json), 2)
     
@@ -49,6 +49,6 @@ class BatteryTest(TestCase):
             'HTTP_AUTHORIZATION': "Bearer " + token["access"]
         }
         response = c.get("/api/battery/", {'lesson_id': lesson.id}, **auth_headers)
-        response_json = loads(response.json())
+        response_json = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response_json), 1)
