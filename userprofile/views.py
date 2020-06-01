@@ -16,9 +16,8 @@ class ProfileByUsername(APIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(
-                data="User {} not found".format(username),
-                status=404, content_type="text/plain"
+                {"detail": "User {} not found".format(username)},
+                status=404
             )
         user_serializer = UserSerializer(user)
-        user_json = JSONRenderer().render(user_serializer.data)
-        return Response(data=user_json, status=200, content_type="application/json")
+        return Response(user_serializer.data)

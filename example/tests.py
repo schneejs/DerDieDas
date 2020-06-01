@@ -25,5 +25,5 @@ class ExampleTest(TestCase):
         }
         response_like = c.get("/api/examples/like/", **headers)
         response_woman = c.get("/api/examples/woman/", **headers)
-        self.assertEqual(len(loads(response_like.json())), 2)
-        self.assertEqual(len(loads(response_woman.json())), 2)
+        self.assertEqual(len(response_like.json()), 2)
+        self.assertEqual(len(response_woman.json()), 2)
