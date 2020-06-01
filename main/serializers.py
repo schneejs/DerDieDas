@@ -1,7 +1,14 @@
 from rest_framework.serializers import ModelSerializer
-from main.models import Card, Lesson
+
 from battery.serializers import BatterySerializer
 from example.serializers import ExamplesSerializer
+from main.models import Card, Lesson, Meaning
+
+
+class MeaningSerializer(ModelSerializer):
+    class Meta:
+        model = Meaning
+        fields = ['term', 'meaning']
 
 
 class CardSerializer(ModelSerializer):
@@ -20,15 +27,3 @@ class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson
         fields = ['id', 'name', 'difficulty']
-
-
-class LessonFullSerializer(ModelSerializer):
-    """
-    Full serializer that includes cards
-    """
-    cards = CardSerializer(many=True)
-    
-
-    class Meta:
-        model = Lesson
-        fields = ['id', 'name', 'difficulty', 'cards']
