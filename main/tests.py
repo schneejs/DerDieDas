@@ -39,7 +39,6 @@ class LessonsTest(TestCase):
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
         response_parsed = response.json()
-        print(response_parsed)
         self.assertEqual(len(response_parsed), 2)
 
     def test_generate_lesson_with_max_one(self):

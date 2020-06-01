@@ -52,7 +52,6 @@ class GenerateLesson(APIView):
     def _get_meanings(card, language_code):
         meanings = Meaning.objects.filter(
             card=card, language_code=language_code)
-        print(Meaning.objects.filter())
         meanings_serializer = MeaningSerializer(meanings, many=True)
         return meanings_serializer.data
 
