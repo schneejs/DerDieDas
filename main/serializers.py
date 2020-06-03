@@ -8,7 +8,7 @@ from main.models import Card, Lesson, Meaning
 class MeaningSerializer(ModelSerializer):
     class Meta:
         model = Meaning
-        fields = ['term', 'meaning']
+        fields = ['term', 'meaning', 'order']
 
 
 class CardSerializer(ModelSerializer):

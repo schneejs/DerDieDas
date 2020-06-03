@@ -14,13 +14,13 @@ class LessonsTest(TestCase):
         self.token = Client().post(
             "/api/login/", {"username": "maria", "password": "123"}).json()
         self.lesson = Lesson.objects.create(name="Lesson 1", difficulty="J")
-        card1 = Card.objects.create(
+        self.intro_card = Card.objects.create(
             word="Test", gender="M", lesson=self.lesson)
-        card2 = Card.objects.create(
+        self.regular_card = Card.objects.create(
             word="Wort", gender="N", lesson=self.lesson)
-        Battery.objects.create(card=card2, user=self.user, level=0)
+        Battery.objects.create(card=self.regular_card, user=self.user, level=0)
         Meaning.objects.create(
-            card=card1,
+            card=self.intro_card,
             language_code="en",
             meaning="Test meaning"
         )
@@ -49,3 +49,24 @@ class LessonsTest(TestCase):
         )
         response_parsed = response.json()
         self.assertEqual(len(response_parsed), 1)
+
+    def test_answer(self):
+        headers = {
+            'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]
+        }
+        for _ in range(7):
+            Client().post(
+                "/api/lessons/answer/{}/1".format(self.intro_card.id),
+                **headers
+            )
+            Client().post(
+                "/api/lessons/answer/{}/0".format(self.regular_card.id),
+                **headers
+            )
+        response = Client().get(
+            "/api/lessons/generate/{}/".format(self.lesson.id),
+            **headers
+        )
+        response_parsed = response.json()
+        self.assertEqual(response_parsed[0]["level"], 4)
+        self.assertEqual(response_parsed[1]["level"], 0)

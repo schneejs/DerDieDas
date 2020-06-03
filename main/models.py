@@ -48,6 +48,8 @@ class Meaning(Model):
     card = ForeignKey(Card, related_name="meanings", on_delete=CASCADE)
     # language codes can be: en, en-us, ru-ru, etc
     language_code = CharField(max_length=5)
+    # Put this meaning in any order, lowest shown first
+    order = SmallIntegerField(default=0)
     # Term that is added to the meaning in italic
     term = CharField(max_length=32, blank=True)
     meaning = CharField(max_length=192)

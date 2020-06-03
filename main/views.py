@@ -1,4 +1,5 @@
-from random import random, sample
+from enum import IntEnum
+from random import choice, random, sample
 
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -10,8 +11,9 @@ from battery.serializers import BatterySerializer
 from example.models import Example
 from example.serializers import ExamplesSerializer
 from login.utils import get_language_code
-from main.models import Lesson, Meaning
+from main.models import Card, Lesson, Meaning
 from main.serializers import LessonSerializer, MeaningSerializer
+from main.utils import settings
 
 
 class ListLessons(ListAPIView):
@@ -25,17 +27,12 @@ class ListLessons(ListAPIView):
 
 class GenerateLesson(APIView):
     """
-    View that generates a lesson. It creates different tasks
-    for the user according to their cards' batteries.
-    Types of tasks:
-        1. Word introduction. Creates a new battery.
-        2. Guess the gender. Given three buttons with article
-    names: der, die, das.
-        3. Guess the meaning. Given four words and several
-    examples, one of them is the correct answer.
-        4. Analyze three examples. Given three examples of one
-    hidden word, the user needs to find it.
-    Correct answer charges the battery and vice versa.
+    View that generates a lesson.
+    All cards with battery levels below 4 (or repeating)
+    are asked everyday.
+    If a user have never seen a card, which means
+    the user has no battery corresponding to the card
+    the function will generate an introductory task.
     """
 
     @staticmethod
@@ -87,24 +84,43 @@ class GenerateLesson(APIView):
                 # Introduce the card to the user
                 level = -1
             examples = Example.objects.filter(string__icontains=card.word)
-            task = {"card_id": card.id}
-            if level == -1:
-                # word introduction
-                task["type"] = "intro"
-                task["word"] = str(card)
-                task["meanings"] = self._get_meanings(card, language_code)
-                task["examples"] = self._shuffle_examples(examples, 5)
-            elif level == 0:
-                if random() < 0.5:
-                    # gender guessing task
-                    task["type"] = "gender"
-                    task["word"] = card.word
-                else:
-                    # meaning guessing task
-                    task["type"] = "meaning"
-                    task["word"] = str(card)
-            elif level > 2:
-                # TODO: 4th task type
-                pass
+            # gender guessing task
+            task = {
+                "card_id": card.id,
+                "word": card.word,
+                "meanings": self._get_meanings(card, language_code),
+                "examples": self._shuffle_examples(examples, 5),
+                "answer": card.gender,
+                "level": level
+            }
             tasks.append(task)
         return Response(tasks)
+
+
+class AnswerCard(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, card_pk, is_correct):
+        try:
+            card = Card.objects.get(pk=card_pk)
+        except Card.DoesNotExist:
+            return Response({"detail": "Card not found"}, status=404)
+        try:
+            battery = Battery.objects.get(card=card, user=request.user)
+        except Battery.DoesNotExist:
+            # if card exists but there's no corresponding battery
+            # then the card was only introduced to the user
+            Battery.objects.create(
+                user=request.user,
+                card=card,
+                level=settings()["MIN_BATTERY_LEVEL"]
+            )
+            return Response(status=201)
+        if is_correct > 0:
+            if battery.level < 4:
+                battery.level += 1
+        else:
+            if battery.level > 0:
+                battery.level -= 1
+        battery.save()
+        return Response()
