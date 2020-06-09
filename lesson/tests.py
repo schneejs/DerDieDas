@@ -5,7 +5,8 @@ from django.test import Client, TestCase
 
 from battery.models import Battery
 from example.models import Example
-from lesson.models import *
+from lesson.models import Lesson
+from card.models import Card, Meaning
 
 
 class LessonsTest(TestCase):
@@ -56,11 +57,11 @@ class LessonsTest(TestCase):
         }
         for _ in range(7):
             Client().post(
-                "/api/lessons/answer/{}/1".format(self.intro_card.id),
+                "/api/card/answer/{}/1".format(self.intro_card.id),
                 **headers
             )
             Client().post(
-                "/api/lessons/answer/{}/0".format(self.regular_card.id),
+                "/api/card/answer/{}/0".format(self.regular_card.id),
                 **headers
             )
         response = Client().get(
@@ -73,7 +74,7 @@ class LessonsTest(TestCase):
 
     def test_bury_card(self):
         response = Client().post(
-            "/api/lessons/bury/{}".format(self.lesson.id),
+            "/api/card/bury/{}".format(self.lesson.id),
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
         self.assertEqual(response.status_code, 200)
@@ -86,7 +87,7 @@ class LessonsTest(TestCase):
     
     def test_unbury_card(self):
         response = Client().post(
-            "/api/lessons/unbury/{}".format(self.lesson.id),
+            "/api/card/unbury/{}".format(self.lesson.id),
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
         self.assertEqual(response.status_code, 200)

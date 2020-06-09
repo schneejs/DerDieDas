@@ -1,23 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from battery.serializers import BatterySerializer
-from example.serializers import ExamplesSerializer
-from lesson.models import Card, Lesson, Meaning
-
-
-class MeaningSerializer(ModelSerializer):
-    class Meta:
-        model = Meaning
-        fields = ['id', 'term', 'meaning', 'order']
-
-
-class CardSerializer(ModelSerializer):
-    battery = BatterySerializer()
-    examples = ExamplesSerializer(many=True)
-
-    class Meta:
-        model = Card
-        fields = ['gender', 'word', 'battery', 'examples']
+from lesson.models import Lesson
 
 
 class LessonSerializer(ModelSerializer):

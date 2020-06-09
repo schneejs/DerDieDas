@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'lesson.apps.LessonConfig',
+    'card.apps.CardConfig',
     'userprofile.apps.UserprofileConfig',
     'login.apps.LoginConfig',
     'example.apps.ExampleConfig',
@@ -63,8 +64,8 @@ MIDDLEWARE = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=65),
 }
 
 if DEBUG is True:

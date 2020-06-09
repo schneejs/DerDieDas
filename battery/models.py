@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from lesson.models import *
+from card.models import Card
 from lesson.utils import settings
 
 

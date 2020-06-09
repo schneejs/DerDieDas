@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from card.models import Card, Meaning
+
+admin.site.register(Card)
+admin.site.register(Meaning)
