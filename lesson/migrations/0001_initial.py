@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('word', models.CharField(max_length=64)),
                 ('gender', models.CharField(choices=[('M', 'Der'), ('F', 'Die'), ('N', 'Das')], max_length=1)),
-                ('lesson', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.Lesson')),
+                ('lesson', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lesson.Lesson')),
             ],
         ),
         migrations.CreateModel(
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('level', models.SmallIntegerField(validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(4)])),
                 ('last_modified', models.DateTimeField(auto_now=True)),
-                ('card', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.Card')),
+                ('card', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lesson.Card')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

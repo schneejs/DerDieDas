@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from json import loads
-from main.models import *
+from lesson.models import *
 from example.models import *
 
 

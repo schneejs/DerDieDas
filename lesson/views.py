@@ -10,10 +10,10 @@ from battery.models import Battery
 from battery.serializers import BatterySerializer
 from example.models import Example
 from example.serializers import ExamplesSerializer
-from login.utils import get_language_code
-from main.models import Card, Lesson, Meaning
-from main.serializers import LessonSerializer, MeaningSerializer
-from main.utils import settings
+from lesson.models import Card, Lesson, Meaning
+from lesson.serializers import LessonSerializer, MeaningSerializer
+from lesson.utils import settings
+from userprofile.utils import get_language_code
 
 
 class ListLessons(ListAPIView):
@@ -33,6 +33,9 @@ class GenerateLesson(APIView):
     If a user have never seen a card, which means
     the user has no battery corresponding to the card
     the function will generate an introductory task.
+    Options:
+        ripeOnly - return only cards that were last updated
+    only 1, 2, 7, 14 days ago depending on battery level
     """
 
     @staticmethod
@@ -82,7 +85,10 @@ class GenerateLesson(APIView):
                 level = battery.level
             except Battery.DoesNotExist:
                 # Introduce the card to the user
-                level = -1
+                level = 0
+            # -1 stands for BURIED cards
+            if level == -1:
+                continue
             examples = Example.objects.filter(string__icontains=card.word)
             # gender guessing task
             task = {
@@ -101,6 +107,8 @@ class AnswerCard(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, card_pk, is_correct):
+        min_level = settings()["MIN_BATTERY_LEVEL"]
+        max_level = settings()["MAX_BATTERY_LEVEL"]
         try:
             card = Card.objects.get(pk=card_pk)
         except Card.DoesNotExist:
@@ -113,14 +121,63 @@ class AnswerCard(APIView):
             Battery.objects.create(
                 user=request.user,
                 card=card,
-                level=settings()["MIN_BATTERY_LEVEL"]
+                level=min_level
             )
-            return Response(status=201)
+            return Response()
         if is_correct > 0:
-            if battery.level < 4:
+            if battery.level < max_level:
                 battery.level += 1
         else:
-            if battery.level > 0:
+            if battery.level > min_level:
                 battery.level -= 1
+        battery.save()
+        return Response()
+
+
+class BuryCard(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, card_pk):
+        try:
+            card = Card.objects.get(pk=card_pk)
+        except Card.DoesNotExist:
+            return Response({"detail": "Card not found"}, status=404)
+        try:
+            battery = Battery.objects.get(card=card, user=request.user)
+        except Battery.DoesNotExist:
+            # if card exists but there's no corresponding battery
+            # then the card was only introduced to the user
+            Battery.objects.create(
+                user=request.user,
+                card=card,
+                level=-1 # BURIED
+            )
+            return Response()
+        battery.level = -1
+        battery.save()
+        return Response()
+
+
+class UnburyCard(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, card_pk):
+        min_level = settings()["MIN_BATTERY_LEVEL"]
+        try:
+            card = Card.objects.get(pk=card_pk)
+        except Card.DoesNotExist:
+            return Response({"detail": "Card not found"}, status=404)
+        try:
+            battery = Battery.objects.get(card=card, user=request.user)
+        except Battery.DoesNotExist:
+            # if card exists but there's no corresponding battery
+            # then the card was only introduced to the user
+            Battery.objects.create(
+                user=request.user,
+                card=card,
+                level=min_level
+            )
+            return Response()
+        battery.level = min_level
         battery.save()
         return Response()

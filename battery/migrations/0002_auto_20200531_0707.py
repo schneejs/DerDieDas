@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0004_meaning'),
+        ('lesson', '0004_meaning'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('battery', '0001_initial'),
     ]
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='battery',
             name='card',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='batteries', to='main.Card'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='batteries', to='lesson.Card'),
         ),
         migrations.AlterField(
             model_name='battery',

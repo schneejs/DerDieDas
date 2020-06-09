@@ -5,7 +5,7 @@ from django.test import Client, TestCase
 
 from battery.models import Battery
 from example.models import Example
-from main.models import *
+from lesson.models import *
 
 
 class LessonsTest(TestCase):
@@ -35,7 +35,7 @@ class LessonsTest(TestCase):
 
     def test_generate_lesson(self):
         response = Client().get(
-            "/api/lessons/generate/{}/".format(self.lesson.id),
+            "/api/lessons/generate/{}".format(self.lesson.id),
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
         response_parsed = response.json()
@@ -43,7 +43,7 @@ class LessonsTest(TestCase):
 
     def test_generate_lesson_with_max_one(self):
         response = Client().get(
-            "/api/lessons/generate/{}/".format(self.lesson.id),
+            "/api/lessons/generate/{}".format(self.lesson.id),
             {"max_tasks": 1},
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
@@ -64,9 +64,36 @@ class LessonsTest(TestCase):
                 **headers
             )
         response = Client().get(
-            "/api/lessons/generate/{}/".format(self.lesson.id),
+            "/api/lessons/generate/{}".format(self.lesson.id),
             **headers
         )
         response_parsed = response.json()
         self.assertEqual(response_parsed[0]["level"], 4)
         self.assertEqual(response_parsed[1]["level"], 0)
+
+    def test_bury_card(self):
+        response = Client().post(
+            "/api/lessons/bury/{}".format(self.lesson.id),
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = Client().get(
+            "/api/lessons/generate/{}".format(self.lesson.id),
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertEqual(len(response.json()), 1)
+    
+    def test_unbury_card(self):
+        response = Client().post(
+            "/api/lessons/unbury/{}".format(self.lesson.id),
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = Client().get(
+            "/api/lessons/generate/{}".format(self.lesson.id),
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertEqual(len(response.json()), 2)
+        self.assertEqual(response.json()[0]["level"], 0)

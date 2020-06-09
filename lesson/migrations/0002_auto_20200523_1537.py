@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0001_initial'),
+        ('lesson', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='card',
             name='lesson',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cards', to='main.Lesson'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cards', to='lesson.Lesson'),
         ),
     ]

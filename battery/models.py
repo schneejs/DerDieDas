@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from main.models import *
-from main.utils import settings
+from lesson.models import *
+from lesson.utils import settings
 
 
 class Battery(models.Model):
@@ -18,7 +18,8 @@ class Battery(models.Model):
     card = models.ForeignKey(
         Card, related_name="batteries", on_delete=models.CASCADE)
     level = models.SmallIntegerField(validators=[
-        MinValueValidator(settings()["MIN_BATTERY_LEVEL"]),
+        # value -1 is needed for buried cards that user doesn't want to study
+        MinValueValidator(settings()["MIN_BATTERY_LEVEL"] - 1),
         MaxValueValidator(settings()["MAX_BATTERY_LEVEL"])
     ])
     last_modified = models.DateTimeField(auto_now=True)
