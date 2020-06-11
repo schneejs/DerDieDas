@@ -65,7 +65,7 @@ class LessonsTest(TestCase):
                 **headers
             )
         response = Client().get(
-            "/api/lessons/generate/{}".format(self.lesson.id),
+            "/api/lessons/generate/{}?ripe-only=0".format(self.lesson.id),
             **headers
         )
         response_parsed = response.json()

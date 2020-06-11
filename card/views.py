@@ -35,7 +35,7 @@ class AnswerCard(APIView):
             Battery.objects.create(
                 user=request.user,
                 card=card,
-                level=min_level
+                level=min_level + 1
             )
             return Response()
         if is_correct > 0:

@@ -1,10 +1,11 @@
 from enum import IntEnum
+from math import expm1
 from random import choice, random, sample
 
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
 
 from battery.models import Battery
 from battery.serializers import BatterySerializer
@@ -36,8 +37,9 @@ class GenerateLesson(APIView):
     the user has no battery corresponding to the card
     the function will generate an introductory task.
     Options:
-        ripeOnly - return only cards that were last updated
-    only 1, 2, 7, 14 days ago depending on battery level
+        ripe-only [1, 0] - return only cards that were last updated
+    only 1, 2, 7, 14 days ago depending on battery level,
+    defaults to true.
     """
 
     @staticmethod
@@ -57,7 +59,16 @@ class GenerateLesson(APIView):
         meanings_serializer = MeaningSerializer(meanings, many=True)
         return meanings_serializer.data
 
+    @staticmethod
+    def _is_ripe(dt, level):
+        return dt.now().timestamp() - dt.timestamp() > expm1(level) * 86400
+
     def get(self, request, pk):
+        # Parameters
+        try:
+            ripe_only = request.query_params["ripe-only"] == '1'
+        except:
+            ripe_only = True
         # Use's object and its additional fields
         user = request.user
         language_code = get_language_code(user)
@@ -85,6 +96,11 @@ class GenerateLesson(APIView):
             try:
                 battery = card.batteries.get(user=user)
                 level = battery.level
+                # Skip generating this task if not enough time
+                # passed from last update
+                # we don't need it if battery doesn't exist
+                if ripe_only and not self._is_ripe(battery.last_modified, level):
+                    continue
             except Battery.DoesNotExist:
                 # Introduce the card to the user
                 level = 0
