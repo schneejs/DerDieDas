@@ -1,8 +1,7 @@
-from django.urls import path, include
+from django.urls import include, re_path
 
 from userprofile.views import *
 
 urlpatterns = [
-    path('<str:username>/', ProfileByUsername.as_view()),
-    path('', Profile.as_view())
+    re_path(r'^(?P<username>\w*)$', Profile.as_view())
 ]
