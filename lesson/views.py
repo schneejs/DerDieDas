@@ -114,7 +114,7 @@ class GenerateLesson(APIView):
                 "word": card.word,
                 "meanings": self._get_meanings(card, language_code),
                 "examples": self._shuffle_examples(examples, 5),
-                "answer": card.gender,
+                "answer": card.gender if card.second_gender is None else card.gender + card.second_gender,
                 "level": level
             }
             tasks.append(task)

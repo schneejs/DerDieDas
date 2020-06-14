@@ -14,8 +14,22 @@ def _tupleslist_get(tl, key):
 
 
 class Card(Model):
+    """
+    Model for cards - words with corresponding lesson and gender (up to 2)
+    German has a small set of words that have 3 genders which aren't supported:
+    https://en.wiktionary.org/wiki/Appendix:German_nouns_which_have_all_three_genders
+    """
+
     def __str__(self):
-        return "{} {}".format(_tupleslist_get(self.GENDERS, self.gender), self.word)
+        first_gender = _tupleslist_get(self.GENDERS, self.gender)
+        if self.second_gender is not None:
+            return "{}/{} {}".format(
+                first_gender,
+                _tupleslist_get(self.GENDERS, self.second_gender),
+                self.word
+            )
+        else:
+            return "{} {}".format(first_gender, self.word)
 
     GENDERS = [
         ('M', 'Der'),
@@ -27,6 +41,7 @@ class Card(Model):
         Lesson, related_name="cards", on_delete=CASCADE)
     word = CharField(max_length=64)
     gender = CharField(max_length=1, choices=GENDERS)
+    second_gender = CharField(max_length=1, choices=GENDERS, null=True, default=None)
 
 
 class Meaning(Model):
