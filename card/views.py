@@ -1,6 +1,7 @@
 from enum import IntEnum
 from random import choice, random, sample
 
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,6 +49,28 @@ class AnswerCard(APIView):
         return Response()
 
 
+class ListBuriedCards(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, lesson_pk=None):
+        if lesson_pk:
+            lesson = get_object_or_404(Lesson, pk=lesson_pk)
+            requested_cards = Card.objects.filter(lesson=lesson)
+        else:
+            requested_cards = Card.objects.all()
+        user = request.user
+        users_buried_cards_batteries = Battery.objects.filter(
+            user=user, level=-1)  # BURIED
+        users_buried_cards = [
+            battery.card for battery in users_buried_cards_batteries]
+        # TODO: optimize this
+        requested_users_buried_cards = set(
+            requested_cards) & set(users_buried_cards)
+        card_serializer = CardSerializer(
+            requested_users_buried_cards, many=True)
+        return Response(card_serializer.data)
+
+
 class BuryCard(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -64,7 +87,7 @@ class BuryCard(APIView):
             Battery.objects.create(
                 user=request.user,
                 card=card,
-                level=-1 # BURIED
+                level=-1  # BURIED
             )
             return Response()
         battery.level = -1

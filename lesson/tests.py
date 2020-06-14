@@ -4,9 +4,9 @@ from django.contrib.auth.models import *
 from django.test import Client, TestCase
 
 from battery.models import Battery
+from card.models import Card, Meaning
 from example.models import Example
 from lesson.models import Lesson
-from card.models import Card, Meaning
 
 
 class LessonsTest(TestCase):
@@ -50,51 +50,3 @@ class LessonsTest(TestCase):
         )
         response_parsed = response.json()
         self.assertEqual(len(response_parsed), 1)
-
-    def test_answer(self):
-        headers = {
-            'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]
-        }
-        for _ in range(7):
-            Client().post(
-                "/api/card/answer/{}/1".format(self.intro_card.id),
-                **headers
-            )
-            Client().post(
-                "/api/card/answer/{}/0".format(self.regular_card.id),
-                **headers
-            )
-        response = Client().get(
-            "/api/lessons/generate/{}?ripe-only=0".format(self.lesson.id),
-            **headers
-        )
-        response_parsed = response.json()
-        self.assertEqual(response_parsed[0]["level"], 4)
-        self.assertEqual(response_parsed[1]["level"], 0)
-
-    def test_bury_card(self):
-        response = Client().post(
-            "/api/card/bury/{}".format(self.lesson.id),
-            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
-        )
-        self.assertEqual(response.status_code, 200)
-
-        response = Client().get(
-            "/api/lessons/generate/{}".format(self.lesson.id),
-            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
-        )
-        self.assertEqual(len(response.json()), 1)
-    
-    def test_unbury_card(self):
-        response = Client().post(
-            "/api/card/unbury/{}".format(self.lesson.id),
-            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
-        )
-        self.assertEqual(response.status_code, 200)
-
-        response = Client().get(
-            "/api/lessons/generate/{}".format(self.lesson.id),
-            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
-        )
-        self.assertEqual(len(response.json()), 2)
-        self.assertEqual(response.json()[0]["level"], 0)

@@ -1,3 +1,4 @@
+from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
 from battery.serializers import BatterySerializer
@@ -12,9 +13,11 @@ class MeaningSerializer(ModelSerializer):
 
 
 class CardSerializer(ModelSerializer):
-    battery = BatterySerializer()
-    examples = ExamplesSerializer(many=True)
+    gender = SerializerMethodField("get_full_gender")
+
+    def get_full_gender(self, card) -> str:
+        return card.gender if card.second_gender is None else card.gender + card.second_gender
 
     class Meta:
         model = Card
-        fields = ['gender', 'word', 'battery', 'examples']
+        fields = ['gender', 'word']

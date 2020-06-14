@@ -41,7 +41,8 @@ class Card(Model):
         Lesson, related_name="cards", on_delete=CASCADE)
     word = CharField(max_length=64)
     gender = CharField(max_length=1, choices=GENDERS)
-    second_gender = CharField(max_length=1, choices=GENDERS, null=True, default=None)
+    second_gender = CharField(
+        max_length=1, choices=GENDERS, null=True, default=None)
 
 
 class Meaning(Model):
