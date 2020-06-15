@@ -15,7 +15,8 @@ from datetime import timedelta
 
 GLOBAL_SETTINGS = {
     'MIN_BATTERY_LEVEL': 0,
-    'MAX_BATTERY_LEVEL': 4
+    'MAX_BATTERY_LEVEL': 4,
+    'LANGUAGES': ["en", "ru"]
 }
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -65,7 +66,7 @@ MIDDLEWARE = [
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=65),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
 }
 
 if DEBUG is True:

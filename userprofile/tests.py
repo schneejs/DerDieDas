@@ -69,3 +69,30 @@ class LessonsTest(TestCase):
             HTTP_AUTHORIZATION="Bearer " + self.token["access"]
         )
         self.assertEqual(response.status_code, 405)
+
+
+class EditorsTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("maria", password="123")
+        self.user2 = User.objects.create_user("john", password="123")
+        group = Group.objects.create(name="Editors")
+        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="lesson")])
+        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="card")])
+        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="meaning")])
+        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="example")])
+        group.user_set.add(self.user2)
+        self.editors = group
+        self.token = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"}).json()
+        self.headers = {
+            "HTTP_AUTHORIZATION": "Bearer " + self.token["access"]
+        }
+    
+    def test_is_editor(self):
+        response = Client().get("/api/profile/maria", **self.headers)
+        rjson = response.json()
+        self.assertEqual(rjson["is_editor"], False)
+
+        response = Client().get("/api/profile/john", **self.headers)
+        rjson = response.json()
+        self.assertEqual(rjson["is_editor"], True)
