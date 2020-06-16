@@ -2,7 +2,7 @@ from enum import IntEnum
 from math import expm1
 from random import choice, random, sample
 
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,6 +16,7 @@ from example.serializers import ExamplesSerializer
 from lesson.models import Lesson
 from lesson.serializers import LessonSerializer
 from lesson.utils import settings
+from userprofile.permissions import IsEditor
 from userprofile.utils import get_language_code
 
 
@@ -26,6 +27,15 @@ class ListLessons(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+
+
+class CreateLesson(CreateAPIView):
+    """
+    View for creating lessons for editors
+    """
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [IsEditor]
 
 
 class GenerateLesson(APIView):
@@ -68,6 +78,7 @@ class GenerateLesson(APIView):
         try:
             ripe_only = request.query_params["ripe-only"] == '1'
         except:
+            # if something goes wrong use this default value
             ripe_only = True
         # Use's object and its additional fields
         user = request.user

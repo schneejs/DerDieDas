@@ -84,8 +84,13 @@ class EditorsTest(TestCase):
         self.editors = group
         self.token = Client().post(
             "/api/login/", {"username": "maria", "password": "123"}).json()
+        self.token2 = Client().post(
+            "/api/login/", {"username": "john", "password": "123"}).json()
         self.headers = {
             "HTTP_AUTHORIZATION": "Bearer " + self.token["access"]
+        }
+        self.headers2 = {
+            "HTTP_AUTHORIZATION": "Bearer " + self.token2["access"]
         }
     
     def test_is_editor(self):
@@ -96,3 +101,17 @@ class EditorsTest(TestCase):
         response = Client().get("/api/profile/john", **self.headers)
         rjson = response.json()
         self.assertEqual(rjson["is_editor"], True)
+    
+    def test_create_lesson(self):
+        # Should deny access
+        response = Client().post("/api/lessons/create", {
+            "name": "Test3",
+            "difficulty": "M"
+        }, **self.headers)
+        self.assertEqual(response.status_code, 403)
+        response = Client().post("/api/lessons/create", {
+            "name": "Test3",
+            "difficulty": "M"
+        }, **self.headers2)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.json()["id"], 0)
