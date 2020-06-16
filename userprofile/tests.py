@@ -103,15 +103,15 @@ class EditorsTest(TestCase):
         self.assertEqual(rjson["is_editor"], True)
     
     def test_create_lesson(self):
-        # Should deny access
+        # Must deny access
         response = Client().post("/api/lessons/create", {
             "name": "Test3",
             "difficulty": "M"
         }, **self.headers)
         self.assertEqual(response.status_code, 403)
+        # Must grant access
         response = Client().post("/api/lessons/create", {
             "name": "Test3",
             "difficulty": "M"
         }, **self.headers2)
         self.assertEqual(response.status_code, 201)
-        self.assertGreater(response.json()["id"], 0)

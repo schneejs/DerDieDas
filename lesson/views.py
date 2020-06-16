@@ -2,7 +2,8 @@ from enum import IntEnum
 from math import expm1
 from random import choice, random, sample
 
-from rest_framework.generics import CreateAPIView, ListAPIView
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,6 +33,30 @@ class ListLessons(ListAPIView):
 class CreateLesson(CreateAPIView):
     """
     View for creating lessons for editors
+    """
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [IsEditor]
+
+
+class DeleteLesson(DestroyAPIView):
+    """
+    View for deleting lessons for editors
+    """
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [IsEditor]
+
+    def destroy(self, request, pk=None):
+        lesson = get_object_or_404(Lesson, pk=pk)
+        lesson.cards.all().delete()
+        lesson.delete()
+        return Response()
+
+
+class UpdateLesson(UpdateAPIView):
+    """
+    View for updating lessons
     """
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
