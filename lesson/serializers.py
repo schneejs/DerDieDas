@@ -9,4 +9,4 @@ class LessonSerializer(ModelSerializer):
     """
     class Meta:
         model = Lesson
-        fields = ['id', 'name', 'difficulty']
+        fields = ['id', 'name', 'difficulty', 'is_public']

@@ -13,7 +13,7 @@
     1. Supported languages list
     1. is_editor in profile (done)
     1. Creating, deleting, updating lessons lessons (done)
-    1. Public and hidden lessons
+    1. Public and hidden lessons (done)
     1. Modifying lessons - adding cards with meanings to lessons
     1. Modifying cards, able to modify all meanings in all languages
     1. Deleting cards

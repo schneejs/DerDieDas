@@ -12,3 +12,4 @@ class Lesson(Model):
     ]
     name = CharField(max_length=64)
     difficulty = CharField(max_length=1, choices=DIFFICULTIES)
+    is_public = BooleanField(default=False)

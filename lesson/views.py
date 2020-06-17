@@ -3,7 +3,8 @@ from math import expm1
 from random import choice, random, sample
 
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                     ListAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,11 +24,20 @@ from userprofile.utils import get_language_code
 
 class ListLessons(ListAPIView):
     """
-    View for listing lessons
+    View for listing public lessons
+    """
+    queryset = Lesson.objects.filter(is_public=True)
+    serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ListAllLessons(ListAPIView):
+    """
+    View for listing all lessons. Useful for editors.
     """
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEditor]
 
 
 class CreateLesson(CreateAPIView):

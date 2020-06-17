@@ -25,7 +25,7 @@ class LessonsTest(TestCase):
         group.user_set.add(self.user)
         self.token = Client().post(
             "/api/login/", {"username": "maria", "password": "123"}).json()
-        self.lesson = Lesson.objects.create(name="Lesson 1", difficulty="J")
+        self.lesson = Lesson.objects.create(name="Lesson 1", difficulty="J", is_public=True)
         self.intro_card = Card.objects.create(
             word="Test", gender="M", lesson=self.lesson)
         self.regular_card = Card.objects.create(
@@ -52,7 +52,8 @@ class LessonsTest(TestCase):
 
         response = Client().post("/api/lessons/create", {
             "name": "Lesson 2",
-            "difficulty": 'M'
+            "difficulty": 'M',
+            "is_public": False
         }, HTTP_AUTHORIZATION="Bearer " + self.token["access"])
         rjson = response.json()
         id = rjson["id"]
@@ -60,6 +61,11 @@ class LessonsTest(TestCase):
 
         response = Client().get(
             "/api/lessons/list", HTTP_AUTHORIZATION="Bearer " + self.token["access"])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+        response = Client().get(
+            "/api/lessons/list/all", HTTP_AUTHORIZATION="Bearer " + self.token["access"])
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
 
