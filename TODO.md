@@ -9,15 +9,14 @@
 1. Language code support (done)
 1. Tasks generation view (done)
 1. Buried cards listing API (done)
-1. Lesson editing API
-    1. Supported languages list
+1. Lesson editing API (done)
+    1. Supported languages list (done)
     1. is_editor in profile (done)
     1. Creating, deleting, updating lessons lessons (done)
     1. Public and hidden lessons (done)
-    1. Modifying lessons - adding cards with meanings to lessons
-    1. Modifying cards, able to modify all meanings in all languages
-    1. Deleting cards
-    1. Adding examples.
+    1. Modifying lessons - adding cards with meanings to lessons (done)
+    1. Deleting cards (done)
+    1. Adding examples (done)
 1. Registration API
 1. API Documentation (https://drf-swagger.readthedocs.io/en/latest/readme.html)
 

@@ -16,7 +16,10 @@ from datetime import timedelta
 GLOBAL_SETTINGS = {
     'MIN_BATTERY_LEVEL': 0,
     'MAX_BATTERY_LEVEL': 4,
-    'LANGUAGES': ["en", "ru"]
+    'LANGUAGES': {
+        "en": "English",
+        "ru": "Russian"
+    }
 }
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
