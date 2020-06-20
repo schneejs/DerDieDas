@@ -23,7 +23,7 @@ class ExampleTest(TestCase):
         headers = {
             'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]
         }
-        response_like = c.get("/api/examples/like/", **headers)
-        response_woman = c.get("/api/examples/woman/", **headers)
+        response_like = c.get("/api/examples/search/like", **headers)
+        response_woman = c.get("/api/examples/search/woman", **headers)
         self.assertEqual(len(response_like.json()), 2)
         self.assertEqual(len(response_woman.json()), 2)

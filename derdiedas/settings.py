@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'userprofile.apps.UserprofileConfig',
     'login.apps.LoginConfig',
     'example.apps.ExampleConfig',
-    'battery.apps.BatteryConfig'
+    'battery.apps.BatteryConfig',
+    'register.apps.RegisterConfig'
 ]
 
 MIDDLEWARE = [

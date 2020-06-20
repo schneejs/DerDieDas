@@ -3,5 +3,6 @@ from example.views import *
 
 
 urlpatterns = [
-    path('<str:word>/', FindExamples.as_view())
+    path('search/<str:word>', FindExamples.as_view()),
+    path('<int:pk>', ExampleView.as_view())
 ]
