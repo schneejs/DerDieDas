@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'lesson.apps.LessonConfig',
     'card.apps.CardConfig',
     'userprofile.apps.UserprofileConfig',
