@@ -4,5 +4,5 @@ from register.views import *
 
 urlpatterns = [
     path('languages', Languages.as_view()),
-    re_path('', SignUp.as_view())
+    path('', SignUp.as_view())
 ]
