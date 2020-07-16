@@ -18,7 +18,7 @@
     1. Deleting cards (done)
     1. Adding examples (done)
 1. Registration API (done)
-1. API Documentation (https://drf-swagger.readthedocs.io/en/latest/readme.html)
+1. API Documentation (done)
 
 # Version 1.1
 1. Cards repetition from all lessons

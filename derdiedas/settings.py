@@ -75,8 +75,8 @@ SIMPLE_JWT = {
 }
 
 if DEBUG is True:
-    INSTALLED_APPS += ('corsheaders', )
-    MIDDLEWARE += ('corsheaders.middleware.CorsMiddleware', )
+    INSTALLED_APPS.insert(0, 'corsheaders')
+    MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 # Enabled if debug is true
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
