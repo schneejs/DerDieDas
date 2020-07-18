@@ -28,6 +28,13 @@ class BuriedCards(TestCase):
         for i in range(5):
             Example.objects.create(string="Test {}".format(i + 1))
 
+    def test_lessons_cards(self):
+        headers = {
+            'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]
+        }
+        response = Client().get('/api/card/lesson/{}'.format(self.lesson.id), **headers)
+        self.assertEqual(len(response.json()), 2)
+
     def test_answer(self):
         headers = {
             'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]

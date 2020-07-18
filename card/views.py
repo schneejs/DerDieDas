@@ -48,6 +48,17 @@ class AnswerCard(APIView):
         return Response()
 
 
+class LessonsCardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, lesson_pk):
+        cards = Card.objects.filter(lesson=lesson_pk)
+        if len(cards) == 0:
+            return Response(status=404)
+        card_serializer = CardSerializer(cards, many=True)
+        return Response(card_serializer.data)
+
+
 class CardView(RetrieveUpdateDestroyAPIView):
     queryset = Card.objects.all()
     serializer_class = CardSerializer
