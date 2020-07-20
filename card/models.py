@@ -42,7 +42,7 @@ class Card(Model):
     word = CharField(max_length=64)
     gender = CharField(max_length=1, choices=GENDERS)
     second_gender = CharField(
-        max_length=1, choices=GENDERS, null=True, default=None)
+        max_length=1, choices=GENDERS, blank=True, default='')
 
 
 class Meaning(Model):
