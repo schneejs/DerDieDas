@@ -9,6 +9,89 @@ from example.models import Example
 from lesson.models import Lesson
 
 
+class Meanings(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser("maria", password="123")
+        self.token = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"}).json()
+        self.headers = {
+            'HTTP_AUTHORIZATION': "Bearer " + self.token["access"]
+        }
+        self.lesson = Lesson.objects.create(name="Lesson 1", difficulty="J")
+        self.intro_card = Card.objects.create(
+            word="Test", gender="M", lesson=self.lesson)
+        self.regular_card = Card.objects.create(
+            word="Wort", gender="N", lesson=self.lesson)
+        Battery.objects.create(card=self.regular_card, user=self.user, level=0)
+        Meaning.objects.create(
+            card=self.intro_card,
+            language_code="en",
+            meaning="Test meaning"
+        )
+        for i in range(5):
+            Example.objects.create(string="Test {}".format(i + 1))
+    
+    def test_empty_card(self):
+        response = Client().get("/api/card/meaning/" + str(self.regular_card.id), **self.headers)
+        self.assertEqual(len(response.json()), 0)
+    
+    def test_full_card(self):
+        response = Client().get("/api/card/meaning/" + str(self.intro_card.id), **self.headers)
+        self.assertEqual(len(response.json()), 1)
+
+    def test_all_cards(self):
+        response = Client().get("/api/card/meaning", **self.headers)
+        self.assertEqual(len(response.json()), 1)
+
+    def test_card_id_required(self):
+        response = Client().post(
+            "/api/card/meaning",
+            {
+                "card_id": "BEPISBEPIS",
+                "language_code": "en",
+                "meaning": "Word meaning"
+            },
+            **self.headers
+        )
+        self.assertEqual(response.status_code, 401)
+    
+    def test_language_code_does_not_exist(self):
+        response = Client().post(
+            "/api/card/meaning",
+            {
+                "card_id": self.regular_card.id,
+                "language_code": "IDONTEXIST",
+                "meaning": "Word meaning"
+            },
+            **self.headers
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_language_no_meaning_given(self):
+        response = Client().post(
+            "/api/card/meaning",
+            {
+                "card_id": self.regular_card.id,
+                "language_code": "en",
+            },
+            **self.headers
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_adding_cards(self):
+        response = Client().post(
+            "/api/card/meaning",
+            {
+                "card_id": self.regular_card.id,
+                "language_code": "en",
+                "meaning": "Word meaning"
+            },
+            **self.headers
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["order"], 0)
+        self.assertEqual(response.json()["meaning"], "Word meaning")
+
 class BuriedCards(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("maria", password="123")

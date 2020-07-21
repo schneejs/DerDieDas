@@ -2,7 +2,7 @@ from enum import IntEnum
 from random import choice, random, sample
 
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -59,17 +59,42 @@ class LessonsCardView(APIView):
         return Response(card_serializer.data)
 
 
+class CreateCardView(CreateAPIView):
+    queryset = Card.objects.all()
+    serializer_class = CardSerializer
+    permission_classes = [IsEditor]
+
+
 class CardView(RetrieveUpdateDestroyAPIView):
     queryset = Card.objects.all()
     serializer_class = CardSerializer
     permission_classes = [IsEditor]
 
 
-class MeaningView(RetrieveUpdateDestroyAPIView):
-    queryset = Meaning.objects.all()
-    serializer_class = MeaningSerializer
+class MeaningView(APIView):
     permission_classes = [IsEditor]
 
+    def get(self, request, card_pk=None):
+        if card_pk:
+            meanings = Meaning.objects.filter(card=card_pk)
+        else:
+            meanings = Meaning.objects.all()
+        return Response(MeaningSerializer(meanings, many=True).data)
+
+    def post(self, request):
+        if "card_id" not in request.data or not str(request.data["card_id"]).isdigit() \
+        or "card_id" in request.data and len(Card.objects.filter(pk=request.data['card_id'])) == 0:
+            return Response({"detail": "Card ID is missing or does not exist"}, status=401)
+        if "language_code" not in request.data \
+        or "language_code" in request.data and request.data["language_code"] not in settings()['LANGUAGES'].keys():
+            return Response({"detail": "Wrong language code"}, status=401)
+        if "meaning" not in request.data:
+            return Response({"detail": "Meaning field is required"}, status=401)
+        meaningArgs = request.data.dict()
+        meaningArgs["card"] = Card.objects.get(pk=int(meaningArgs["card_id"]))
+        del meaningArgs["card_id"]
+        meaning = Meaning.objects.create(**meaningArgs)
+        return Response(MeaningSerializer(meaning).data, status=201)
 
 class ListBuriedCards(APIView):
     permission_classes = [IsAuthenticated]
