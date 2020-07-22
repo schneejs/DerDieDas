@@ -52,9 +52,8 @@ class LessonsCardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, lesson_pk):
-        cards = Card.objects.filter(lesson=lesson_pk)
-        if len(cards) == 0:
-            return Response(status=404)
+        lesson = get_object_or_404(Lesson, pk=lesson_pk)
+        cards = Card.objects.filter(lesson=lesson)
         card_serializer = CardSerializer(cards, many=True)
         return Response(card_serializer.data)
 
