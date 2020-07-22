@@ -58,11 +58,26 @@ class LessonsCardView(APIView):
         return Response(card_serializer.data)
 
 
-class CreateCardView(CreateAPIView):
-    queryset = Card.objects.all()
-    serializer_class = CardSerializer
+class CreateCardView(APIView):
     permission_classes = [IsEditor]
 
+    def post(self, request):
+        try:
+            card_raw = {
+                "lesson": get_object_or_404(Lesson, pk=int(request.data["lesson"])),
+                "word": request.data["word"],
+                "gender": request.data["gender"],
+                "second_gender": request.data["second_gender"]
+            }
+            if request.data["word"] == "" \
+            or card_raw["gender"] not in 'MFN' \
+            or not (card_raw["second_gender"] in 'MFN' \
+            or card_raw["second_gender"] == ''):
+                raise ValueError
+        except (KeyError, ValueError):
+            return Response({"detail": "Wrong data"}, status=400)
+        card = Card.objects.create(**card_raw)
+        return Response(CardSerializer(card).data, status=201)
 
 class CardView(RetrieveUpdateDestroyAPIView):
     queryset = Card.objects.all()
@@ -83,12 +98,12 @@ class MeaningView(APIView):
     def post(self, request):
         if "card_id" not in request.data or not str(request.data["card_id"]).isdigit() \
         or "card_id" in request.data and len(Card.objects.filter(pk=request.data['card_id'])) == 0:
-            return Response({"detail": "Card ID is missing or does not exist"}, status=401)
+            return Response({"detail": "Card ID is missing or does not exist"}, status=400)
         if "language_code" not in request.data \
         or "language_code" in request.data and request.data["language_code"] not in settings()['LANGUAGES'].keys():
-            return Response({"detail": "Wrong language code"}, status=401)
+            return Response({"detail": "Wrong language code"}, status=400)
         if "meaning" not in request.data:
-            return Response({"detail": "Meaning field is required"}, status=401)
+            return Response({"detail": "Meaning field is required"}, status=400)
         meaningArgs = request.data.dict()
         meaningArgs["card"] = Card.objects.get(pk=int(meaningArgs["card_id"]))
         del meaningArgs["card_id"]
