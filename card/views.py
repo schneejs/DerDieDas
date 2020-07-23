@@ -1,6 +1,7 @@
 from enum import IntEnum
 from random import choice, random, sample
 
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -85,6 +86,7 @@ class CardView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsEditor]
 
 
+# TODO: separate these two methods to make it work in urlpatterns
 class MeaningView(APIView):
     permission_classes = [IsEditor]
 
@@ -104,7 +106,13 @@ class MeaningView(APIView):
             return Response({"detail": "Wrong language code"}, status=400)
         if "meaning" not in request.data:
             return Response({"detail": "Meaning field is required"}, status=400)
-        meaningArgs = request.data.dict()
+        if type(request.data) is dict:
+            meaningArgs = request.data
+        # request.data can be QueryDict because
+        # the tests send 'application/x-www-form-urlencoded'
+        # and browser's axios sends JSON
+        elif type(request.data) is QueryDict:
+            meaningArgs = request.data.dict()
         meaningArgs["card"] = Card.objects.get(pk=int(meaningArgs["card_id"]))
         del meaningArgs["card_id"]
         meaning = Meaning.objects.create(**meaningArgs)

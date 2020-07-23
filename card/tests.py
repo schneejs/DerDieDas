@@ -99,22 +99,22 @@ class Meanings(TestCase):
         )
 
     def test_empty_card(self):
-        response = Client().get("/api/card/meaning/" +
+        response = Client().get("/api/card/meanings/" +
                                 str(self.regular_card.id), **self.headers)
         self.assertEqual(len(response.json()), 0)
 
     def test_full_card(self):
-        response = Client().get("/api/card/meaning/" +
+        response = Client().get("/api/card/meanings/" +
                                 str(self.intro_card.id), **self.headers)
         self.assertEqual(len(response.json()), 1)
 
     def test_all_cards(self):
-        response = Client().get("/api/card/meaning", **self.headers)
+        response = Client().get("/api/card/meanings", **self.headers)
         self.assertEqual(len(response.json()), 1)
 
     def test_card_id_required(self):
         response = Client().post(
-            "/api/card/meaning",
+            "/api/card/meanings",
             {
                 "card_id": "BEPISBEPIS",
                 "language_code": "en",
@@ -126,7 +126,7 @@ class Meanings(TestCase):
 
     def test_language_code_does_not_exist(self):
         response = Client().post(
-            "/api/card/meaning",
+            "/api/card/meanings",
             {
                 "card_id": self.regular_card.id,
                 "language_code": "IDONTEXIST",
@@ -138,7 +138,7 @@ class Meanings(TestCase):
 
     def test_language_no_meaning_given(self):
         response = Client().post(
-            "/api/card/meaning",
+            "/api/card/meanings",
             {
                 "card_id": self.regular_card.id,
                 "language_code": "en",
@@ -149,7 +149,7 @@ class Meanings(TestCase):
 
     def test_adding_cards(self):
         response = Client().post(
-            "/api/card/meaning",
+            "/api/card/meanings",
             {
                 "card_id": self.regular_card.id,
                 "language_code": "en",

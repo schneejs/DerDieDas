@@ -11,6 +11,6 @@ urlpatterns = [
     path('buried/lesson/<int:lesson_pk>', ListBuriedCards.as_view()),
     path('bury/<int:card_pk>', BuryCard.as_view()),
     path('unbury/<int:card_pk>', UnburyCard.as_view()),
-    path('meaning/<int:card_pk>', MeaningView.as_view()),
-    path('meaning', MeaningView.as_view())
+    path('meanings/<int:card_pk>', MeaningView.as_view()),
+    path('meanings', MeaningView.as_view())
 ]

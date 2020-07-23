@@ -9,7 +9,7 @@ from example.serializers import ExamplesSerializer
 class MeaningSerializer(ModelSerializer):
     class Meta:
         model = Meaning
-        fields = ['id', 'term', 'meaning', 'order']
+        fields = ['id', 'term', 'meaning', 'order', 'language_code']
 
 
 class CardSerializer(ModelSerializer):
