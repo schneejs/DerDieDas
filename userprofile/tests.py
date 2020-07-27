@@ -18,7 +18,7 @@ class LessonsTest(TestCase):
         )
         obj = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(obj["pk"], 1)
+        self.assertEqual(obj["id"], 1)
 
     def test_user_no_username(self):
         response = Client().get(
@@ -27,7 +27,7 @@ class LessonsTest(TestCase):
         )
         obj = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(obj["pk"], 1)
+        self.assertEqual(obj["id"], 1)
 
     def test_nonexistent(self):
         response = Client().get(
