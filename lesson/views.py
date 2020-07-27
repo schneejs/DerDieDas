@@ -88,16 +88,6 @@ class GenerateLesson(APIView):
     """
 
     @staticmethod
-    def _shuffle_examples(examples, size):
-        if size > len(examples):
-            size = len(examples)
-        examples_serializer = ExamplesSerializer(examples, many=True)
-        shuffled_raw = [ordered_dict["string"]
-                        for ordered_dict in examples_serializer.data]
-        shuffled = sample(shuffled_raw, size)
-        return shuffled
-
-    @staticmethod
     def _get_meanings(card, language_code):
         meanings = Meaning.objects.filter(
             card=card, language_code=language_code)
@@ -153,13 +143,11 @@ class GenerateLesson(APIView):
             # -1 stands for BURIED cards
             if level == -1:
                 continue
-            examples = Example.objects.filter(string__icontains=card.word)
             # gender guessing task
             task = {
                 "card_id": card.id,
                 "word": card.word,
                 "meanings": self._get_meanings(card, language_code),
-                "examples": self._shuffle_examples(examples, 5),
                 "answer": card.gender if card.second_gender is None else card.gender + card.second_gender,
                 "level": level
             }
