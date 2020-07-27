@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,6 +16,7 @@ class FindExamples(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, word=None):
+        # TODO: add offset parameter
         if not word:
             return Response({"detail": "Word not given"}, status=400)
         examples = Example.objects.filter(string__icontains=word)
@@ -29,6 +30,12 @@ class FindExamples(APIView):
 
 
 class ExampleView(RetrieveUpdateDestroyAPIView):
+    queryset = Example.objects.all()
+    serializer_class = ExamplesSerializer
+    permission_classes = [IsEditor]
+
+
+class CreateExampleView(CreateAPIView):
     queryset = Example.objects.all()
     serializer_class = ExamplesSerializer
     permission_classes = [IsEditor]

@@ -56,7 +56,7 @@ class LessonsTest(TestCase):
             "is_public": False
         }, HTTP_AUTHORIZATION="Bearer " + self.token["access"])
         rjson = response.json()
-        id = rjson["id"]
+        id = rjson["pk"]
         self.assertGreater(id, 0)
 
         response = Client().get(
