@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from datetime import timedelta
 
+import dj_database_url
 import django_heroku
 
 GLOBAL_SETTINGS = {
@@ -37,7 +38,9 @@ SECRET_KEY = 'g4h*vy@$_qeb@f5tx02(d*#d9ag&_un4pt3#%5w7q$%g9=fg9_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -62,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -159,9 +163,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    # os.path.join(BASE_DIR, "static"),
     # '/var/www/static/',
 ]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Needed for herokus
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 django_heroku.settings(locals())
