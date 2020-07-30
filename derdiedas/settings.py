@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from datetime import timedelta
 
+import django_heroku
+
 GLOBAL_SETTINGS = {
     'MIN_BATTERY_LEVEL': 0,
     'MAX_BATTERY_LEVEL': 4,
@@ -33,7 +35,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g4h*vy@$_qeb@f5tx02(d*#d9ag&_un4pt3#%5w7q$%g9=fg9_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -160,3 +162,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     # '/var/www/static/',
 ]
+
+# Needed for herokus
+django_heroku.settings(locals())
