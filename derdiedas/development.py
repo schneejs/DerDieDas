@@ -13,10 +13,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from datetime import timedelta
 
-import dj_database_url
-import django_heroku
-from corsheaders.defaults import default_headers
-
 GLOBAL_SETTINGS = {
     'MIN_BATTERY_LEVEL': 0,
     'MAX_BATTERY_LEVEL': 4,
@@ -37,11 +33,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g4h*vy@$_qeb@f5tx02(d*#d9ag&_un4pt3#%5w7q$%g9=fg9_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    '*'
-]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -66,7 +60,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,15 +74,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
 }
 
-INSTALLED_APPS.insert(0, 'corsheaders')
-MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+if DEBUG is True:
+    INSTALLED_APPS.insert(0, 'corsheaders')
+    MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 # Enabled if debug is true
 CORS_ORIGIN_ALLOW_ALL = DEBUG
-# Only a few sites allowed
-CORS_ORIGIN_WHITELIST = ['https://schneejs.github.io']
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'authorization',
-]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -168,13 +157,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    # os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
     # '/var/www/static/',
 ]
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Needed for herokus
-DATABASES['default'] = dj_database_url.config(
-    conn_max_age=600, ssl_require=True)
-django_heroku.settings(locals())
