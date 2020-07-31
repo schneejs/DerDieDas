@@ -86,8 +86,7 @@ if DEBUG is True:
 # Enabled if debug is true
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
-if not DEBUG:
-    CORS_ORIGIN_WHITELIST = ['schneejs.github.io']
+CORS_ORIGIN_WHITELIST = ['schneejs.github.io']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
