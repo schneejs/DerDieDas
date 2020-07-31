@@ -86,6 +86,9 @@ if DEBUG is True:
 # Enabled if debug is true
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
+if not DEBUG:
+    CORS_ORIGIN_WHITELIST = ['schneejs.github.io']
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication'
@@ -170,5 +173,6 @@ STATICFILES_DIRS = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Needed for herokus
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+DATABASES['default'] = dj_database_url.config(
+    conn_max_age=600, ssl_require=True)
 django_heroku.settings(locals())
