@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lesson.utils import settings
+from userprofile.serializers import UserSerializer
 
 EMAIL_REGEX = compile(r'^[^@]+@[^@]+\.[^@]+$')
 
@@ -35,7 +36,7 @@ class SignUp(APIView):
             except KeyError:
                 last_name = ""
         else:
-            first_name, last_name = None, None
+            first_name, last_name = '', ''
         # Check that input is correct
         if type(username) is str and len(username) >= 5 and username.isascii() and username.isalnum() \
                 and (email is None or EMAIL_REGEX.fullmatch(email) is not None):  # email is correct or NULL
@@ -43,7 +44,7 @@ class SignUp(APIView):
             user.first_name = first_name
             user.last_name = last_name
             user.save()
-            return Response(status=201)
+            return Response(UserSerializer(user).data, status=201)
         else:
             # Frontend should handle checking input
             return Response(status=400)

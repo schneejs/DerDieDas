@@ -17,6 +17,30 @@ class TestRegister(TestCase):
         })
         self.assertEqual(response.status_code, 201)
 
+    def test_register_noemail(self):
+        response = Client().post("/api/register", {
+            "username": "maria",
+            "password": "sekret",
+            "first_name": "Maria",
+            "last_name": "Müller"
+        })
+        self.assertEqual(response.status_code, 201)
+    
+    def test_register_noname(self):
+        response = Client().post("/api/register", {
+            "username": "maria",
+            "password": "sekret",
+            "email": "maria@example.com"
+        })
+        self.assertEqual(response.status_code, 201)
+
+    def test_register_only_username_and_password(self):
+        response = Client().post("/api/register", {
+            "username": "maria",
+            "password": "sekret",
+        })
+        self.assertEqual(response.status_code, 201)
+
     def test_register_wrong_username(self):
         response = Client().post("/api/register", {
             "username": "mari",
