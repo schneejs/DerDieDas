@@ -41,24 +41,6 @@ class TestRegister(TestCase):
         })
         self.assertEqual(response.status_code, 201)
 
-    def test_register_wrong_username(self):
-        response = Client().post("/api/register", {
-            "username": "mari",
-            "password": "sekret",
-            "email": "maria@example.com",
-            "first_name": "Maria",
-            "last_name": "Müller"
-        })
-        self.assertEqual(response.status_code, 400)
-        response = Client().post("/api/register", {
-            "username": "mariа",  # last letter is cyrillic
-            "password": "sekret",
-            "email": "maria@example.com",
-            "first_name": "Maria",
-            "last_name": "Müller"
-        })
-        self.assertEqual(response.status_code, 400)
-
     def test_register_wrong_email(self):
         response = Client().post("/api/register", {
             "username": "maria",

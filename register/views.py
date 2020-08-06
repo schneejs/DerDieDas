@@ -1,14 +1,14 @@
 from re import compile
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lesson.utils import settings
 from userprofile.serializers import UserSerializer
-
-EMAIL_REGEX = compile(r'^[^@]+@[^@]+\.[^@]+$')
 
 
 class Languages(APIView):
@@ -38,13 +38,15 @@ class SignUp(APIView):
         else:
             first_name, last_name = '', ''
         # Check that input is correct
-        if type(username) is str and len(username) >= 5 and username.isascii() and username.isalnum() \
-                and (email is None or EMAIL_REGEX.fullmatch(email) is not None):  # email is correct or NULL
+        try:
             user = User.objects.create_user(username, email, password)
-            user.first_name = first_name
-            user.last_name = last_name
+        except IntegrityError:
+            return Response({"detail": "Integrity Error, username is probably not unique"}, status=400)
+        user.first_name = first_name
+        user.last_name = last_name
+        try:
+            user.full_clean()
             user.save()
-            return Response(UserSerializer(user).data, status=201)
-        else:
-            # Frontend should handle checking input
-            return Response(status=400)
+        except ValidationError as e:
+            return Response({"detail": e.message_dict}, status=400)
+        return Response(UserSerializer(user).data, status=201)

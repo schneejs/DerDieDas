@@ -1,3 +1,4 @@
+from itertools import repeat
 from json import dumps
 
 from django.contrib.auth.models import *
@@ -60,6 +61,17 @@ class LessonsTest(TestCase):
         with self.assertRaises(User.languagecode.RelatedObjectDoesNotExist):
             self.user2.languagecode.language_code
         self.assertEqual(response.status_code, 403)
+    
+    def test_set_long_first_name(self):
+        response = Client().patch(
+            "/api/profile/maria",
+            {"first_name": "".join(repeat('a', 41))},
+            content_type="application/json",
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertIn("detail", response.json())
+        self.assertIn("first_name", response.json()["detail"])
+        self.assertEqual(response.status_code, 400)
 
     def test_put_method_fails(self):
         response = Client().put(
