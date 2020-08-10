@@ -29,7 +29,7 @@ class Profile(APIView):
         return Response(user_serializer.data)
 
     def patch(self, request, username):
-        if username is not None and request.user.username != username:
+        if username and request.user.username != username:
             return Response({"detail": "You're attempting to change another user's data"}, status=403)
         user = self._detect_user(request, username)
 
