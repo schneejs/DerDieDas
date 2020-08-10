@@ -22,7 +22,7 @@ class Card(Model):
 
     def __str__(self):
         first_gender = _tupleslist_get(self.GENDERS, self.gender)
-        if self.second_gender is not None:
+        if self.second_gender:
             return "{}/{} {}".format(
                 first_gender,
                 _tupleslist_get(self.GENDERS, self.second_gender),
