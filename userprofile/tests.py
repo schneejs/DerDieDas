@@ -7,7 +7,7 @@ from django.test import Client, TestCase
 
 class LessonsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user("maria", password="123")
+        self.user = User.objects.create_user("maria", "test@example.com", "123")
         self.user2 = User.objects.create_user("john", password="123")
         self.token = Client().post(
             "/api/login/", {"username": "maria", "password": "123"}).json()
@@ -72,6 +72,27 @@ class LessonsTest(TestCase):
         self.assertIn("detail", response.json())
         self.assertIn("first_name", response.json()["detail"])
         self.assertEqual(response.status_code, 400)
+
+    def test_set_email(self):
+        response = Client().get(
+            "/api/profile/maria",
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertIn("email", response.json())
+        self.assertEqual(response.json()["email"], "test@example.com")
+
+        response = Client().patch(
+            "/api/profile/maria",
+            {"email": "newtest@example.com"},
+            content_type="application/json",
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        response = Client().get(
+            "/api/profile/maria",
+            HTTP_AUTHORIZATION="Bearer " + self.token["access"]
+        )
+        self.assertIn("email", response.json())
+        self.assertEqual(response.json()["email"], "newtest@example.com")
 
     def test_put_method_fails(self):
         response = Client().put(

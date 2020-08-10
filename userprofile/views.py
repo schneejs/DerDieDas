@@ -50,6 +50,8 @@ class Profile(APIView):
             user.last_name = request.data["last_name"]
         if "username" in request.data:
             user.username = request.data["username"]
+        if "email" in request.data:
+            user.email = request.data["email"]
 
         try:
             user.full_clean()
