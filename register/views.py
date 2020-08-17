@@ -38,12 +38,12 @@ class SignUp(APIView):
         else:
             first_name, last_name = '', ''
         # Check that input is correct
-        try:
-            user = User.objects.create_user(username, email, password)
-        except IntegrityError:
-            return Response({"detail": "Integrity Error, username is probably not unique"}, status=400)
+        user = User()
+        user.username = username
+        user.email = email
         user.first_name = first_name
         user.last_name = last_name
+        user.set_password(password)
         try:
             user.full_clean()
             user.save()

@@ -58,3 +58,20 @@ class TestRegister(TestCase):
             "last_name": "Müller"
         })
         self.assertEqual(response.status_code, 400)
+
+    def test_username_non_unique(self):
+        Client().post("/api/register", {
+            "username": "maria",
+            "password": "sekret",
+            "email": "maria@example.com",
+            "first_name": "Maria",
+            "last_name": "Müller"
+        })
+        response = Client().post("/api/register", {
+            "username": "maria",
+            "password": "sekret",
+            "email": "maria@example.com",
+            "first_name": "Maria",
+            "last_name": "Müller"
+        })
+        self.assertEqual(response.status_code, 400)
