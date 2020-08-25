@@ -60,3 +60,19 @@ class Profile(APIView):
             return Response({"detail": e.message_dict}, status=400)
 
         return Response(UserSerializer(user).data)
+
+
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            old_password = request.data["old_password"]
+            new_password = request.data["new_password"]
+        except KeyError:
+            return Response({"detail": "Not enough data."}, status=400)
+        if not request.user.check_password(old_password):
+            return Response({"detail": "Old password is incorrect."}, status=400)
+        request.user.set_password(new_password)
+        request.user.save()
+        return Response()

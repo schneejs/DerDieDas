@@ -7,7 +7,8 @@ from django.test import Client, TestCase
 
 class LessonsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user("maria", "test@example.com", "123")
+        self.user = User.objects.create_user(
+            "maria", "test@example.com", "123")
         self.user2 = User.objects.create_user("john", password="123")
         self.token = Client().post(
             "/api/login/", {"username": "maria", "password": "123"}).json()
@@ -61,7 +62,7 @@ class LessonsTest(TestCase):
         with self.assertRaises(User.languagecode.RelatedObjectDoesNotExist):
             self.user2.languagecode.language_code
         self.assertEqual(response.status_code, 403)
-    
+
     def test_set_long_first_name(self):
         response = Client().patch(
             "/api/profile/maria",
@@ -109,10 +110,14 @@ class EditorsTest(TestCase):
         self.user = User.objects.create_user("maria", password="123")
         self.user2 = User.objects.create_user("john", password="123")
         group = Group.objects.create(name="Editors")
-        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="lesson")])
-        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="card")])
-        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="meaning")])
-        group.permissions.add(*[a.id for a in Permission.objects.filter(codename__contains="example")])
+        group.permissions.add(
+            *[a.id for a in Permission.objects.filter(codename__contains="lesson")])
+        group.permissions.add(
+            *[a.id for a in Permission.objects.filter(codename__contains="card")])
+        group.permissions.add(
+            *[a.id for a in Permission.objects.filter(codename__contains="meaning")])
+        group.permissions.add(
+            *[a.id for a in Permission.objects.filter(codename__contains="example")])
         group.user_set.add(self.user2)
         self.editors = group
         self.token = Client().post(
@@ -125,7 +130,7 @@ class EditorsTest(TestCase):
         self.headers2 = {
             "HTTP_AUTHORIZATION": "Bearer " + self.token2["access"]
         }
-    
+
     def test_is_editor(self):
         response = Client().get("/api/profile/maria", **self.headers)
         rjson = response.json()
@@ -134,7 +139,7 @@ class EditorsTest(TestCase):
         response = Client().get("/api/profile/john", **self.headers)
         rjson = response.json()
         self.assertEqual(rjson["is_editor"], True)
-    
+
     def test_create_lesson(self):
         # Must deny access
         response = Client().post("/api/lessons/create", {
@@ -148,3 +153,56 @@ class EditorsTest(TestCase):
             "difficulty": "M"
         }, **self.headers2)
         self.assertEqual(response.status_code, 201)
+
+
+class ChangePasswordTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("maria", password="123")
+        token = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"}).json()
+        self.headers = {
+            "HTTP_AUTHORIZATION": "Bearer " + token["access"]
+        }
+
+    def test_regular_change(self):
+        response = Client().post("/api/profile/password/change", {
+            "old_password": "123",
+            "new_password": "456"
+        }, **self.headers)
+        self.assertEqual(response.status_code, 200)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "456"})
+        self.assertEqual(response.status_code, 200)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_no_old_password_given(self):
+        response = Client().post("/api/profile/password/change", {
+            "new_password": "456"
+        }, **self.headers)
+        self.assertEqual(response.status_code, 400)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "456"})
+        self.assertEqual(response.status_code, 401)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_no_new_password_given(self):
+        response = Client().post("/api/profile/password/change", {
+            "old_password": "123",
+        }, **self.headers)
+        self.assertEqual(response.status_code, 400)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "456"})
+        self.assertEqual(response.status_code, 401)
+
+        response = Client().post(
+            "/api/login/", {"username": "maria", "password": "123"})
+        self.assertEqual(response.status_code, 200)
