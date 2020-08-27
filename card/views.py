@@ -135,7 +135,7 @@ class ListBuriedCards(APIView):
         # TODO: optimize this
         requested_users_buried_cards = set(
             requested_cards) & set(users_buried_cards)
-        card_serializer = CardSerializer(
+        card_serializer = BuriedCardSerializer(
             requested_users_buried_cards, many=True)
         return Response(card_serializer.data)
 

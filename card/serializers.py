@@ -16,3 +16,8 @@ class CardSerializer(ModelSerializer):
     class Meta:
         model = Card
         fields = ['id', 'gender', 'second_gender', 'word']
+
+class BuriedCardSerializer(CardSerializer):
+    class Meta:
+        model = Card
+        fields = ['id', 'lesson', 'gender', 'second_gender', 'word']
